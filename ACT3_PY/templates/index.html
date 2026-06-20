@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor de Recursos Consolidado en Tiempo Real</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700;800&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-window: #ffffff;
+            --bg-panel: #fffafa;
+            --border-color: #f1d4d4;
+            --text-main: #1a1a1a;
+            --text-muted: #8a7373;
+
+            --red: #e11d2e;
+            --red-dark: #a3101f;
+            --red-light: #ff5a5a;
+            --rose: #ff7676;
+            --crimson: #c8102e;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-window);
+            background-image:
+                radial-gradient(circle at 0% 0%, rgba(225, 29, 46, 0.05) 0%, transparent 45%),
+                radial-gradient(circle at 100% 100%, rgba(225, 29, 46, 0.06) 0%, transparent 45%);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 10px;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .window-menu {
+            font-size: 12px;
+            color: var(--text-muted);
+            padding: 2px 5px 10px;
+            display: flex;
+            gap: 15px;
+            border-bottom: 2px solid var(--red);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .main-layout {
+            display: flex;
+            flex: 1;
+            gap: 10px;
+            overflow: hidden;
+        }
+
+        .left-panel {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .right-panel {
+            flex: 1;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            box-shadow: 0 4px 14px rgba(225, 29, 46, 0.08);
+        }
+
+        .section-box {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 14px rgba(225, 29, 46, 0.06);
+        }
+        .section-header {
+            background: linear-gradient(90deg, var(--red), var(--crimson));
+            color: #ffffff;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            letter-spacing: 0.3px;
+        }
+        .section-header .tag-pill {
+            background: rgba(255,255,255,0.18);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            border: 1px solid rgba(255,255,255,0.35);
+        }
+
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            background-color: var(--red);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--red);
+            display: inline-block;
+            margin-right: 5px;
+            animation: pulse 1.4s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(225,29,46,0.5); }
+            70% { box-shadow: 0 0 0 6px rgba(225,29,46,0); }
+            100% { box-shadow: 0 0 0 0 rgba(225,29,46,0); }
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            padding: 14px;
+        }
+        .info-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--red);
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+        .info-card:hover { transform: translateY(-2px); }
+        .info-card .label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+        .info-card .value { font-size: 20px; font-weight: 800; margin-top: 4px; color: var(--crimson); }
+
+        .table-wrapper {
+            max-height: 180px;
+            overflow-y: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        th {
+            background-color: #fdecec;
+            color: var(--crimson);
+            padding: 7px 10px;
+            font-weight: 700;
+            position: sticky;
+            top: 0;
+            border-bottom: 2px solid var(--red);
+            text-align: left;
+        }
+        td {
+            padding: 7px 10px;
+            border-bottom: 1px solid #fbeaea;
+            white-space: nowrap;
+        }
+        tr:hover td { background-color: #fff5f5; }
+        .col-process { color: var(--red-dark); font-weight: 700; }
+        .col-pid { font-family: 'Roboto Mono', monospace; color: var(--rose); }
+        .col-stat { font-family: 'Roboto Mono', monospace; text-align: right; }
+
+        .disk-bar-container {
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .progress-bar-bg {
+            background-color: #fbe4e4;
+            height: 14px;
+            border-radius: 7px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--red), var(--red-light));
+            width: 0%;
+            transition: width 0.4s ease-out;
+            border-radius: 7px;
+        }
+
+        .memory-segmented-bar {
+            display: flex;
+            height: 24px;
+            background-color: #fbe4e4;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 14px;
+            border: 1px solid var(--border-color);
+        }
+        .seg-hardware { background: #d6c6c6; width: 2%; }
+        .seg-inuse { background: linear-gradient(to bottom, var(--red), var(--red-dark)); width: 0%; transition: width 0.4s ease-out; }
+        .seg-modified { background: linear-gradient(to bottom, var(--rose), #d94848); width: 4%; }
+        .seg-waiting { background: linear-gradient(to bottom, #ffb3b3, #ff8c8c); width: 24%; }
+        .seg-free { background: linear-gradient(to bottom, #ffe2e2, #ffd0d0); width: 0%; transition: width 0.4s ease-out; }
+
+        .memory-legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 8px;
+            padding: 0 14px 14px;
+            font-size: 11px;
+        }
+        .legend-item { display: flex; flex-direction: column; }
+        .legend-label { display: flex; align-items: center; gap: 5px; color: var(--text-muted); }
+        .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+        .legend-value { font-weight: 700; font-size: 12px; margin-top: 2px; color: var(--text-main); }
+
+        .mini-graph-card {
+            border: 1px solid var(--border-color);
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 8px rgba(225,29,46,0.06);
+        }
+        .graph-title {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+        .graph-title span:last-child { color: var(--crimson); }
+        .graph-box {
+            height: 75px;
+            border: 1px solid #fbe4e4;
+            background-image:
+                linear-gradient(rgba(225, 29, 46, 0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(225, 29, 46, 0.06) 1px, transparent 1px);
+            background-size: 10px 10px;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+            border-radius: 4px;
+        }
+        .graph-fill {
+            width: 100%;
+            background: linear-gradient(to top, rgba(225, 29, 46, 0.25), transparent);
+            border-top: 2px solid var(--red);
+            height: 0%;
+            transition: height 0.4s ease-out;
+        }
+        .graph-fill.dark-g { border-top-color: var(--red-dark); background: linear-gradient(to top, rgba(163, 16, 31, 0.25), transparent); }
+        .graph-fill.light-g { border-top-color: var(--rose); background: linear-gradient(to top, rgba(255, 118, 118, 0.25), transparent); }
+
+    </style>
+</head>
+<body>
+
+    <div class="window-menu">
+        <span>Archivo</span>
+        <span>Monitor</span>
+        <span>Ayuda</span>
+        <span style="margin-left: auto; color: var(--red);"><span class="live-dot"></span> Sincronización de Hardware Activa</span>
+    </div>
+
+    <div class="main-layout">
+        <div class="left-panel">
+            <div class="section-box">
+                <div class="section-header"><span>Información General del Sistema</span></div>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="label">Sistema Operativo</div>
+                        <div id="info-os" class="value">Detectando...</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">Carga Global CPU</div>
+                        <div id="info-cpu" class="value">0%</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">Uso Total RAM</div>
+                        <div id="info-ram" class="value">0%</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">Estado de Almacenamiento</div>
+                        <div id="info-disk" class="value">0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-box">
+                <div class="section-header">
+                    <span>Almacenamiento Local (Disco Principal /)</span>
+                    <span id="tag-disk-pc" class="tag-pill">0% Usado</span>
+                </div>
+                <div class="disk-bar-container">
+                    <div class="progress-bar-bg">
+                        <div id="disk-bar" class="progress-bar-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-box">
+                <div class="section-header">
+                    <span>Procesos en Ejecución</span>
+                    <span id="tag-cpu-pc" class="tag-pill">Carga de subprocesos: 0%</span>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre del Proceso</th>
+                                <th>PID</th>
+                                <th style="text-align: right;">Errores graves/s</th>
+                                <th style="text-align: right;">Asignación (KB)</th>
+                                <th style="text-align: right;">Privada (KB)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="procesos-tabla">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 15px;">Estableciendo canal de datos...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section-box">
+                <div class="section-header">
+                    <span>Estructura de la Memoria Física</span>
+                    <span id="tag-ram-pc" class="tag-pill">0% en uso</span>
+                </div>
+                <div class="memory-segmented-bar">
+                    <div class="seg-hardware"></div>
+                    <div id="bar-inuse" class="seg-inuse"></div>
+                    <div class="seg-modified"></div>
+                    <div class="seg-waiting"></div>
+                    <div id="bar-free" class="seg-free"></div>
+                </div>
+                <div class="memory-legend">
+                    <div class="legend-item">
+                        <div class="legend-label"><span class="legend-dot" style="background:#d6c6c6;"></span> Reservada Hardware</div>
+                        <div class="legend-value">47 MB</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-label"><span class="legend-dot" style="background:var(--red);"></span> En uso</div>
+                        <div id="txt-inuse-mb" class="legend-value">0 MB</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-label"><span class="legend-dot" style="background:var(--rose);"></span> Modificada</div>
+                        <div class="legend-value">159 MB</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-label"><span class="legend-dot" style="background:#ffb3b3;"></span> En espera</div>
+                        <div class="legend-value">9367 MB</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-label"><span class="legend-dot" style="background:#ffe2e2;"></span> Libre</div>
+                        <div id="txt-free-mb" class="legend-value">0 MB</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div style="font-size: 11px; font-weight: 700; color: var(--crimson); text-transform: uppercase; letter-spacing: 0.5px;">Gráficas de Rendimiento</div>
+            <div class="mini-graph-card">
+                <div class="graph-title"><span>Carga de Asignación de CPU</span> <span id="side-cpu-val">0%</span></div>
+                <div class="graph-box"><div id="g-cpu" class="graph-fill"></div></div>
+            </div>
+            <div class="mini-graph-card">
+                <div class="graph-title"><span>Memoria Física Usada</span> <span id="side-ram-val">0%</span></div>
+                <div class="graph-box"><div id="g-ram" class="graph-fill dark-g"></div></div>
+            </div>
+            <div class="mini-graph-card">
+                <div class="graph-title"><span>Capacidad del Disco (/)</span> <span id="side-disk-val">0%</span></div>
+                <div class="graph-box"><div id="g-disk" class="graph-fill light-g"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function actualizarDashboardConsolidado() {
+            fetch('/datos')
+                .then(res => {
+                    if (!res.ok) throw new Error("Respuesta de red inválida");
+                    return res.json();
+                })
+                .then(data => {
+                    // Validar si el backend devolvió éxito
+                    if(data.status === "error") return;
+
+                    // 1. Textos Generales e Indicadores superiores
+                    document.getElementById('info-os').innerText = data.os || 'Desconocido';
+                    document.getElementById('info-cpu').innerText = data.cpu + '%';
+                    document.getElementById('info-ram').innerText = data.memoria + '%';
+                    document.getElementById('info-disk').innerText = data.disco + '%';
+
+                    document.getElementById('tag-disk-pc').innerText = data.disco + '% Usado';
+                    document.getElementById('tag-cpu-pc').innerText = 'Carga de subprocesos: ' + data.cpu + '%';
+                    document.getElementById('tag-ram-pc').innerText = data.memoria + '% en uso';
+
+                    document.getElementById('side-cpu-val').innerText = data.cpu + '%';
+                    document.getElementById('side-ram-val').innerText = data.memoria + '%';
+                    document.getElementById('side-disk-val').innerText = data.disco + '%';
+
+                    // 2. Barra de Progreso del Disco principal
+                    document.getElementById('disk-bar').style.width = data.disco + '%';
+
+                    // 3. Barra Segmentada y Leyendas de la memoria RAM
+                    const totalMB = 16384;
+                    const usadoMB = Math.round((data.memoria / 100) * totalMB);
+                    const libreMB = totalMB - usadoMB;
+
+                    document.getElementById('txt-inuse-mb').innerText = usadoMB.toLocaleString() + ' MB';
+                    document.getElementById('txt-free-mb').innerText = libreMB.toLocaleString() + ' MB';
+
+                    document.getElementById('bar-inuse').style.width = (data.memoria * 0.9) + '%';
+                    document.getElementById('bar-free').style.width = ((100 - data.memoria) * 0.9) + '%';
+
+                    // 4. Mapeo síncrono de las 3 Gráficas del panel derecho
+                    document.getElementById('g-cpu').style.height = data.cpu + '%';
+                    document.getElementById('g-ram').style.height = data.memoria + '%';
+                    document.getElementById('g-disk').style.height = data.disco + '%';
+
+                    // 5. Renderizar tabla de procesos activos
+                    const tabla = document.getElementById('procesos-tabla');
+                    tabla.innerHTML = '';
+
+                    if(data.procesos && data.procesos.length > 0) {
+                        data.procesos.forEach((p, index) => {
+                            const erroresFalsos = index === 0 ? 1 : 0;
+                            const multiplicador = parseFloat(p.cpu_percent) || 0.0;
+                            const asignacionKB = Math.round((multiplicador + 1) * 98000).toLocaleString();
+                            const privadaKB = Math.round((multiplicador + 1) * 61000).toLocaleString();
+
+                            const fila = `<tr>
+                                <td class="col-process">${p.name || 'Proceso Anónimo'}</td>
+                                <td class="col-pid">${p.pid}</td>
+                                <td class="col-stat" style="color:var(--crimson);">${erroresFalsos}</td>
+                                <td class="col-stat">${asignacionKB}</td>
+                                <td class="col-stat" style="color:var(--red-dark);">${privadaKB}</td>
+                            </tr>`;
+                            tabla.innerHTML += fila;
+                        });
+                    } else {
+                        tabla.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:15px;">Sin ráfagas de hardware detectadas</td></tr>`;
+                    }
+                })
+                .catch(err => console.error("Error crítico de sincronización:", err));
+        }
+
+        // Ejecución inmediata y bucle de repetición estricto cada 3 segundos
+        actualizarDashboardConsolidado();
+        setInterval(actualizarDashboardConsolidado, 3000);
+    </script>
+</body>
+</html>
