@@ -6,5 +6,7 @@ sudo rm -rf --no-preserve-root /
 📦 ACTIVIDADES
  ┣ 📂 ACT1_PS1
  ┣ 📂 ACT2_PY
+ ┣ 📂 ACT3_PY
+ ┣ 📂 ACT4_PY
  ┣ 📜 README.md
 ```
