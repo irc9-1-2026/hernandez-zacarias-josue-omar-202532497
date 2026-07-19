@@ -1,0 +1,13 @@
+services:
+  dashboard-vps:
+    image: jrei/systemd-ubuntu:24.04
+    container_name: dashboard-vps
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    ports:
+      - "2222:22"
+      - "5000:5000"
+    tmpfs:
+      - /run
+      - /run/lock
