@@ -1,0 +1,475 @@
+/* ============================================================
+   Consulta de Cócteles — Tema NEGRO / BLANCO / ROJO
+   Estilo moderno: glassmorphism, glow rojo, animaciones
+   ============================================================ */
+
+:root {
+  --negro: #0a0a0a;
+  --negro-2: #121212;
+  --panel: rgba(20, 20, 20, 0.75);
+  --panel-solido: #161616;
+  --borde: rgba(255, 255, 255, 0.08);
+  --borde-rojo: rgba(229, 9, 20, 0.5);
+  --rojo: #e50914;
+  --rojo-brillo: #ff1f2d;
+  --rojo-oscuro: #8b0000;
+  --blanco: #ffffff;
+  --gris: #b3b3b3;
+  --gris-tenue: #6e6e6e;
+  --radio: 16px;
+  --glow: 0 0 24px rgba(229, 9, 20, 0.45);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: "Poppins", "Segoe UI", system-ui, -apple-system, sans-serif;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(229, 9, 20, 0.14) 0%, transparent 42%),
+    radial-gradient(circle at 85% 100%, rgba(229, 9, 20, 0.10) 0%, transparent 45%),
+    var(--negro);
+  color: var(--blanco);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* Textura sutil de puntos sobre el fondo */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 22px 22px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ---------- Header ---------- */
+header {
+  text-align: center;
+  padding: 3rem 1rem 1.6rem;
+  position: relative;
+  z-index: 1;
+}
+
+header h1 {
+  font-size: 2.8rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: var(--blanco);
+  text-shadow: 0 0 30px rgba(229, 9, 20, 0.5);
+  animation: aparecer 0.7s ease both;
+}
+
+header h1::after {
+  content: "";
+  display: block;
+  width: 70px;
+  height: 4px;
+  margin: 0.7rem auto 0;
+  background: linear-gradient(90deg, transparent, var(--rojo), transparent);
+  border-radius: 2px;
+  box-shadow: var(--glow);
+}
+
+.subtitulo {
+  color: var(--gris);
+  margin-top: 0.7rem;
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* ---------- Main ---------- */
+main {
+  flex: 1;
+  width: 100%;
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 0 1.4rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- Controles ---------- */
+.controles {
+  background: var(--panel);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  animation: aparecer 0.7s 0.1s ease both;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.tab {
+  background: transparent;
+  color: var(--gris);
+  border: 1px solid var(--borde);
+  padding: 0.55rem 1.2rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  transition: all 0.25s ease;
+}
+
+.tab:hover {
+  color: var(--blanco);
+  border-color: var(--borde-rojo);
+}
+
+.tab.activo {
+  background: var(--rojo);
+  color: var(--blanco);
+  border-color: var(--rojo);
+  font-weight: 600;
+  box-shadow: var(--glow);
+}
+
+.buscador {
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.buscador input,
+.buscador select {
+  flex: 1;
+  min-width: 220px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid var(--borde);
+  color: var(--blanco);
+  padding: 0.85rem 1.1rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.buscador input::placeholder { color: var(--gris-tenue); }
+
+.buscador input:focus,
+.buscador select:focus {
+  border-color: var(--rojo);
+  box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.2);
+}
+
+.buscador select option {
+  background: var(--negro-2);
+  color: var(--blanco);
+}
+
+/* ---------- Botones ---------- */
+button {
+  cursor: pointer;
+  border: none;
+  font-size: 0.95rem;
+  padding: 0.85rem 1.6rem;
+  border-radius: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  transition: transform 0.15s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+button:active { transform: scale(0.96); }
+
+#btnBuscar {
+  background: var(--rojo);
+  color: var(--blanco);
+  box-shadow: 0 4px 18px rgba(229, 9, 20, 0.4);
+}
+
+#btnBuscar:hover {
+  background: var(--rojo-brillo);
+  box-shadow: var(--glow);
+  transform: translateY(-2px);
+}
+
+.secundario {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--blanco);
+  border: 1px solid var(--borde);
+}
+
+.secundario:hover {
+  border-color: var(--rojo);
+  color: var(--rojo-brillo);
+  transform: translateY(-2px);
+}
+
+/* ---------- Estado ---------- */
+.estado {
+  text-align: center;
+  color: var(--gris);
+  margin-bottom: 1.4rem;
+  min-height: 1.2rem;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+}
+
+/* ---------- Grid de resultados ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1.3rem;
+  padding-bottom: 3rem;
+}
+
+.card {
+  background: var(--panel-solido);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+  animation: subir 0.5s ease both;
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 55%, rgba(229, 9, 20, 0.15));
+  opacity: 0;
+  transition: opacity 0.28s ease;
+  pointer-events: none;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  border-color: var(--rojo);
+  box-shadow: 0 14px 40px rgba(229, 9, 20, 0.35);
+}
+
+.card:hover::after { opacity: 1; }
+
+.card img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.card:hover img { transform: scale(1.07); }
+
+.card-info {
+  padding: 0.9rem 1rem 1.1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.card-info h3 {
+  font-size: 1.02rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: var(--blanco);
+}
+
+.card-info span {
+  font-size: 0.76rem;
+  color: var(--rojo-brillo);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-weight: 500;
+}
+
+/* ---------- Modal ---------- */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem;
+  z-index: 100;
+  animation: fade 0.25s ease;
+}
+
+.modal-contenido {
+  background: var(--negro-2);
+  border: 1px solid var(--borde-rojo);
+  border-radius: 20px;
+  max-width: 660px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  padding: 2rem;
+  box-shadow: 0 0 50px rgba(229, 9, 20, 0.3);
+  animation: subir 0.35s ease both;
+}
+
+.modal-contenido::-webkit-scrollbar { width: 8px; }
+.modal-contenido::-webkit-scrollbar-track { background: transparent; }
+.modal-contenido::-webkit-scrollbar-thumb {
+  background: var(--rojo-oscuro);
+  border-radius: 4px;
+}
+
+.cerrar {
+  position: absolute;
+  top: 1rem;
+  right: 1.2rem;
+  background: transparent;
+  color: var(--gris);
+  font-size: 2rem;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.cerrar:hover {
+  color: var(--rojo-brillo);
+  transform: rotate(90deg);
+}
+
+.modal-contenido img {
+  width: 100%;
+  max-width: 280px;
+  border-radius: 16px;
+  display: block;
+  margin: 0 auto 1.3rem;
+  border: 2px solid var(--borde);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+}
+
+.modal-contenido h2 {
+  text-align: center;
+  margin-bottom: 0.6rem;
+  font-size: 1.9rem;
+  font-weight: 700;
+  text-shadow: 0 0 20px rgba(229, 9, 20, 0.4);
+}
+
+.badges {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.badge {
+  background: rgba(229, 9, 20, 0.12);
+  border: 1px solid var(--borde-rojo);
+  color: var(--rojo-brillo);
+  padding: 0.3rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+}
+
+.modal-contenido h4 {
+  margin: 1.3rem 0 0.6rem;
+  color: var(--rojo-brillo);
+  font-size: 1.05rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modal-contenido h4::before {
+  content: "";
+  width: 4px;
+  height: 18px;
+  background: var(--rojo);
+  border-radius: 2px;
+  box-shadow: var(--glow);
+}
+
+.ingredientes {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.5rem;
+}
+
+.ingredientes li {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--borde);
+  padding: 0.6rem 0.9rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  color: var(--blanco);
+  transition: border-color 0.2s;
+}
+
+.ingredientes li:hover { border-color: var(--borde-rojo); }
+
+.instrucciones {
+  line-height: 1.75;
+  color: var(--gris);
+  font-size: 0.95rem;
+}
+
+/* ---------- Utilidades ---------- */
+.oculto { display: none !important; }
+
+footer {
+  text-align: center;
+  padding: 1.8rem;
+  color: var(--gris-tenue);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--borde);
+  position: relative;
+  z-index: 1;
+}
+
+footer a {
+  color: var(--rojo-brillo);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+footer a:hover { text-decoration: underline; }
+
+/* ---------- Animaciones ---------- */
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(-14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes subir {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 560px) {
+  header h1 { font-size: 2.1rem; }
+  .buscador input,
+  .buscador select { min-width: 100%; }
+  .buscador button { flex: 1; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Consulta de Cócteles 🍸</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <h1>🍸 Consulta de Cócteles</h1>
+    <p class="subtitulo">Powered by TheCocktailDB · FastAPI</p>
+  </header>
+
+  <main>
+    <!-- Barra de búsqueda -->
+    <section class="controles">
+      <div class="tabs">
+        <button class="tab activo" data-modo="buscar">Por nombre</button>
+        <button class="tab" data-modo="ingrediente">Por ingrediente</button>
+        <button class="tab" data-modo="categoria">Por categoría</button>
+      </div>
+
+      <div class="buscador">
+        <input
+          type="text"
+          id="entrada"
+          placeholder="Ej: Margarita, Mojito, Vodka..."
+          autocomplete="off"
+        />
+        <select id="selectCategoria" class="oculto"></select>
+        <button id="btnBuscar">Buscar</button>
+        <button id="btnAleatorio" class="secundario">🎲 Sorpréndeme</button>
+      </div>
+    </section>
+
+    <!-- Estado / mensajes -->
+    <p id="estado" class="estado"></p>
+
+    <!-- Resultados -->
+    <section id="resultados" class="grid"></section>
+  </main>
+
+  <!-- Modal de detalle -->
+  <div id="modal" class="modal oculto">
+    <div class="modal-contenido">
+      <button id="cerrarModal" class="cerrar">&times;</button>
+      <div id="modalCuerpo"></div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Aplicativo local · Datos de <a href="https://www.thecocktaildb.com" target="_blank">TheCocktailDB</a></p>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
